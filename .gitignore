@@ -1,0 +1,9 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/UrlShortener.Api/FileContentIndex
+/.vs/UrlShortener.Api/CopilotIndices/18.11.1036.60925
+/.vs
+/UrlShortener.Api/obj
+/UrlShortener.Api/bin/Debug/net10.0
