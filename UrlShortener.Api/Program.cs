@@ -1,9 +1,12 @@
-using UrlShortener.Api.UrlShortener.Domain;
+using UrlShortener.Api.Data;
+using UrlShortener.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IUrlRepository, InMemoryUrlRepository>();
+
+// Dapper repository
+builder.Services.AddScoped<IUrlRepository, DapperUrlRepository>();
 
 var app = builder.Build();
 
