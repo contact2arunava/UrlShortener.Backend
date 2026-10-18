@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using UrlShortener.Domain;
+using UrlShortener.Service;
 
 namespace UrlShortener.Api.Controllers
 {
@@ -7,12 +7,13 @@ namespace UrlShortener.Api.Controllers
     [Route("api/urls")]
     public class UrlController : ControllerBase
     {
-        private readonly IUrlRepository _repo;
+        private readonly IUrlService _service;
 
-        public UrlController(IUrlRepository repo)
+        public UrlController(IUrlService service)
         {
-            _repo = repo;
+            _service = service;
         }
+
 
         [HttpPost]
         public IActionResult Create([FromBody] CreateUrlRequest request)
@@ -20,7 +21,7 @@ namespace UrlShortener.Api.Controllers
             if (!Uri.IsWellFormedUriString(request.LongUrl, UriKind.Absolute))
                 return BadRequest("Invalid URL");
 
-            var url = _repo.Create(request.LongUrl);
+            var url = _service.CreateShortUrl(request.LongUrl);
 
             return Ok(new
             {

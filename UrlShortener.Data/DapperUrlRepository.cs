@@ -1,7 +1,8 @@
-﻿using System.Data;
-using Microsoft.Data.SqlClient;    
+﻿using Microsoft.Data.SqlClient;    
 using Dapper;
 using UrlShortener.Domain;
+using UrlShortener.Data.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 
 namespace UrlShortener.Api.Data
@@ -48,6 +49,20 @@ namespace UrlShortener.Api.Data
 
             return conn.QueryFirstOrDefault<Url>(sql, new { Code = code });
         }
+
+        public Url? GetById(Guid id)
+        {
+            using var conn = new SqlConnection(_connectionString);
+
+            const string sql = @"
+        SELECT Id, Code, LongUrl, CreatedAt, IsActive
+        FROM Urls
+        WHERE Id = @Id;
+    ";
+
+            return conn.QueryFirstOrDefault<Url>(sql, new { Id = id });
+        }
+
 
         private string GenerateCode()
         {

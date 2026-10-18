@@ -1,4 +1,4 @@
-﻿################################################################################
+################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
@@ -7,3 +7,10 @@
 /.vs
 /UrlShortener.Api/obj
 /UrlShortener.Api/bin/Debug/net10.0
+UrlShortener.Service/obj/
+UrlShortener.Tests/obj/
+UrlShortener.Service/bin/
+UrlShortener.Data/bin/
+UrlShortener.Data/obj/
+UrlShortener.Domain/obj/
+UrlShortener.Tests/bin/

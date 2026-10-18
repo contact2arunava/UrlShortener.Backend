@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using UrlShortener.Data.Interfaces;
 namespace UrlShortener.Domain
 {
     public class InMemoryUrlRepository : IUrlRepository
@@ -23,6 +24,13 @@ namespace UrlShortener.Domain
             _store.TryGetValue(code, out var url);
             return url;
         }
+
+        public Url? GetById(Guid id)
+        {
+            return _store.Values.FirstOrDefault(url => url.Id == id);
+        }
+
+
 
         private string GenerateCode()
         {
