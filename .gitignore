@@ -3,14 +3,16 @@
 ################################################################################
 
 /.vs/UrlShortener.Api/FileContentIndex
-/.vs/UrlShortener.Api/CopilotIndices/18.11.1036.60925
 /.vs
-/UrlShortener.Api/obj
-/UrlShortener.Api/bin/Debug/net10.0
+UrlShortener.Api/obj/
+UrlShortener.Api/bin/
 UrlShortener.Service/obj/
-UrlShortener.Tests/obj/
 UrlShortener.Service/bin/
 UrlShortener.Data/bin/
 UrlShortener.Data/obj/
-UrlShortener.Domain/obj/
 UrlShortener.Tests/bin/
+UrlShortener.Tests/obj/
+UrlShortener.Domain/bin/
+UrlShortener.Domain/obj/
+/UrlShortener.Domain/bin/Debug/net10.0/UrlShortener.Domain.pdb
+/UrlShortener.Domain/bin/Debug/net10.0/UrlShortener.Domain.dll
