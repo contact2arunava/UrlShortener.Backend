@@ -16,3 +16,5 @@ UrlShortener.Domain/bin/
 UrlShortener.Domain/obj/
 /UrlShortener.Domain/bin/Debug/net10.0/UrlShortener.Domain.pdb
 /UrlShortener.Domain/bin/Debug/net10.0/UrlShortener.Domain.dll
+UrlShortener.Orchestration/obj/
+UrlShortener.Orchestration/bin/

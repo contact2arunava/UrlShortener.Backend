@@ -8,13 +8,10 @@ using UrlShortener.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/*Add Data Layer to Container.
-The reference to the Data layer is coming through the Service Layer, which is referenced by the API layer.
-This is a common pattern in layered architecture*/
+
 builder.Services.AddDataLayer(builder.Configuration);
-
-
 builder.Services.AddServiceLayer();
+builder.Services.AddOrchestrationLayer();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(); // requires Swashbuckle.AspNetCore package

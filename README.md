@@ -5,7 +5,7 @@ UrlShortener.Backend/
  ├── UrlShortener.Service/        → Business services (optional but recommended)
  ├── UrlShortener.Tests/          → Unit + integration tests
  └── README.md
-
+Swagger Page: https://localhost:7138/swagger/index.html
 
 # UrlShortener.Backend
 Enterprise‑Grade Backend for Agentic URL Shortener
