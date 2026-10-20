@@ -11,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IUrlRepository, DapperUrlRepository>();
         services.AddScoped<IUrlHitRepository, DapperUrlHitRepository>();
+        services.AddScoped<IWorkflowRunRepository, WorkflowRunRepository>();
         return services;
     }
 }

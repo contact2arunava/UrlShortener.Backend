@@ -1,4 +1,4 @@
-﻿namespace UrlShortener.Orchestration;
+﻿namespace UrlShortener.Domain.Workflow;
 
 public class WorkflowNode
 {

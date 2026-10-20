@@ -1,4 +1,6 @@
-﻿namespace UrlShortener.Orchestration.Workflows;
+﻿using UrlShortener.Domain.Workflow;
+
+namespace UrlShortener.Orchestration.Workflows;
 
 public static class SdlcWorkflow
 {
