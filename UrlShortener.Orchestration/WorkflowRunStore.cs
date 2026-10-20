@@ -1,4 +1,4 @@
-﻿namespace UrlShortener.Orchestration;
+﻿namespace UrlShortener.Workflow.Orchestration;
 
 public class WorkflowRunStore
 {

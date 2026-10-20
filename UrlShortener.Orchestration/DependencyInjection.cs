@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using UrlShortener.Orchestration;
-using UrlShortener.Orchestration.Governance;
+using UrlShortener.Workflow.Orchestration;
+using UrlShortener.Workflow.Orchestration.Governance;
 
 public static class DependencyInjection
 {

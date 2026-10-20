@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace UrlShortener.Orchestration.Governance;
+namespace UrlShortener.Workflow.Orchestration.Governance;
 
 public class ManualApprovalService : IApprovalService
 {

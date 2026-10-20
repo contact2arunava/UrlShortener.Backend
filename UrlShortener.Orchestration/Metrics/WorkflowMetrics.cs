@@ -1,4 +1,4 @@
-﻿namespace UrlShortener.Orchestration.Metrics;
+﻿namespace UrlShortener.Workflow.Orchestration.Metrics;
 
 public class WorkflowMetrics
 {

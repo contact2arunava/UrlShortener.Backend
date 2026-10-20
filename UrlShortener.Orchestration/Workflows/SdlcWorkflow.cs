@@ -1,6 +1,6 @@
 ﻿using UrlShortener.Domain.Workflow;
 
-namespace UrlShortener.Orchestration.Workflows;
+namespace UrlShortener.Workflow.Orchestration.Workflows;
 
 public static class SdlcWorkflow
 {

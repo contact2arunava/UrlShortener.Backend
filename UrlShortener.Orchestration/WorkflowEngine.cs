@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using UrlShortener.Domain.Workflow;
-using UrlShortener.Orchestration.Governance;
+using UrlShortener.Workflow.Orchestration.Governance;
 
-namespace UrlShortener.Orchestration
+namespace UrlShortener.Workflow.Orchestration
 {
     public class WorkflowEngine
     {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using UrlShortener.Domain.Workflow;
-using UrlShortener.Orchestration;
-using UrlShortener.Orchestration.Governance;
-using UrlShortener.Orchestration.Workflows;
+using UrlShortener.Workflow.Orchestration;
+using UrlShortener.Workflow.Orchestration.Governance;
+using UrlShortener.Workflow.Orchestration.Workflows;
 
 namespace UrlShortener.Api.Controllers;
 
@@ -60,58 +60,4 @@ public class WorkflowController : ControllerBase
         approvalService.Reject(nodeId);
         return Ok(new { message = $"Node '{nodeId}' rejected." });
     }
-
-
-
-
-
-    //[HttpPost("approve/{nodeId}")]
-    //public IActionResult ApproveNode(string nodeId, [FromServices] IApprovalService approvalService)
-    //{
-    //    approvalService.Approve(nodeId);
-    //    return Ok(new { message = $"Node '{nodeId}' approved." });
-    //}
-
-    //[HttpPost("reject/{nodeId}")]
-    //public IActionResult RejectNode(string nodeId, [FromServices] IApprovalService approvalService)
-    //{
-    //    approvalService.Reject(nodeId);
-    //    return Ok(new { message = $"Node '{nodeId}' approved." });
-    //}
-
-    //[HttpPost("{workflowId}/run")]
-    //public async Task<IActionResult> Run(Guid workflowId,
-    //[FromServices] WorkflowRunStore store,
-    //[FromServices] WorkflowEngine engine)
-    //{
-    //    var run = store.Get(workflowId);
-    //    if (run == null) return NotFound();
-
-    //    var workflow = SdlcWorkflow.Create();
-
-    //    await engine.RunAsync(workflow, run.Context);
-
-    //    run.IsCompleted = true;
-
-    //    return Ok(run.Context.Events);
-    //}
-
-    //[HttpGet("{workflowId}/status")]
-    //public IActionResult Status(Guid workflowId, [FromServices] WorkflowRunStore store)
-    //{
-    //    var run = store.Get(workflowId);
-    //    if (run == null) return NotFound();
-
-    //    return Ok(new
-    //    {
-    //        run.Id,
-    //        run.IsCompleted,
-    //        run.IsWaitingForApproval,
-    //        run.CurrentNode,
-    //        Events = run.Context.Events
-    //    });
-    //}
-
-
-
 }

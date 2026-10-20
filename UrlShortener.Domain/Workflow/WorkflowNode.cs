@@ -8,4 +8,6 @@ public class WorkflowNode
     public List<string> DependsOn { get; set; } = new();
     public bool RequiresApproval { get; set; }
     public int MaxRetries { get; set; } = 3;
+    //mark nodes that can run in parallel
+    public bool RunInParallel { get; set; } = false;
 }

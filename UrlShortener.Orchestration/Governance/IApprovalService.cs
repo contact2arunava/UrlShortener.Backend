@@ -1,4 +1,4 @@
-﻿namespace UrlShortener.Orchestration.Governance;
+﻿namespace UrlShortener.Workflow.Orchestration.Governance;
 
 public interface IApprovalService
 {
