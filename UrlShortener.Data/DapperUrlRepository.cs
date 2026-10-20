@@ -66,7 +66,14 @@ namespace UrlShortener.Api.Data
 
         private string GenerateCode()
         {
-            return Guid.NewGuid().ToString("N")[..8];
+            // 8‑char GUID fragment
+            var guidPart = Guid.NewGuid().ToString("N")[..8];
+
+            // UTC date in yyyyMMdd format (compact + sortable)
+            var datePart = DateTime.UtcNow.ToString("yyyyMMdd");
+
+            // Final unique code
+            return $"{guidPart}{datePart}";
         }
     }
 }

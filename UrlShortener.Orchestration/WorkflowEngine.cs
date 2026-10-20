@@ -60,6 +60,19 @@ namespace UrlShortener.Workflow.Orchestration
             // === 1. Initial execution with parallel support ===
             while (completed.Count + failed.Count < workflow.Count)
             {
+                if (run.IsCanceled)
+                {
+                    _logger.LogWarning("WorkflowRun {RunId} canceled mid-execution.", workflowRunId);
+                    return;
+                }
+
+                if (run.IsPaused)
+                {
+                    _logger.LogInformation("WorkflowRun {RunId} paused mid-execution.", workflowRunId);
+                    return;
+                }
+
+                // existing readyNodes logic...
                 var readyNodes = workflow
                     .Where(n =>
                         !completed.Contains(n.Id) &&
@@ -99,6 +112,9 @@ namespace UrlShortener.Workflow.Orchestration
             // === 2. Auto dynamic re‑planning ===
             if (context.DirtyNodes.Any())
             {
+                if (run.IsCanceled || run.IsPaused)
+                    return;
+
                 _logger.LogInformation(
                     "Dynamic re‑planning triggered. Dirty nodes: {DirtyNodes}",
                     string.Join(", ", context.DirtyNodes));
@@ -171,6 +187,18 @@ namespace UrlShortener.Workflow.Orchestration
             WorkflowContext context,
             WorkflowRun run)
         {
+            if (run.IsCanceled)
+            {
+                _logger.LogWarning("Execution canceled before node {NodeId}", node.Id);
+                return;
+            }
+
+            if (run.IsPaused)
+            {
+                _logger.LogInformation("Execution paused before node {NodeId}", node.Id);
+                return;
+            }
+
             _logger.LogInformation("Starting node {NodeId}", node.Id);
 
             run.CurrentNode = node.Id;

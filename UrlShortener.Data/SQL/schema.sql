@@ -1,7 +1,7 @@
 -----For Url Shortener Persistence-------
 CREATE TABLE Urls (
     Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-    Code NVARCHAR(16) NOT NULL UNIQUE,
+    Code NVARCHAR(25) NOT NULL UNIQUE,
     LongUrl NVARCHAR(MAX) NOT NULL,
     CreatedAt DATETIME2 NOT NULL,
     IsActive BIT NOT NULL

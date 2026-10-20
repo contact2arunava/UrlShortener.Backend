@@ -11,6 +11,7 @@ public static class DependencyInjection
         services.AddScoped<ITestRunnerService, TestRunnerService>();
         services.AddScoped<ICodeGeneratorService, CodeGeneratorService>();
         services.AddScoped<IDocumentationService, DocumentationService>();
+        services.AddScoped<IWorkflowService, WorkflowService>();
         return services;
     }
 }
