@@ -8,6 +8,9 @@ public static class DependencyInjection
     {
         services.AddScoped<IUrlService, UrlService>();
         services.AddScoped<IAnalyticsService, AnalyticsService>();
+        services.AddScoped<ITestRunnerService, TestRunnerService>();
+        services.AddScoped<ICodeGeneratorService, CodeGeneratorService>();
+        services.AddScoped<IDocumentationService, DocumentationService>();
         return services;
     }
 }

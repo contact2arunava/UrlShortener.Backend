@@ -1,4 +1,7 @@
-﻿using UrlShortener.Domain.Workflow;
+﻿using Microsoft.Extensions.DependencyInjection;
+using UrlShortener.Domain.Workflow;
+using UrlShortener.Service;//Ideally Worflow Orchestration should not depend on Service layer,
+                           //but for the sake of using the service interfaces, we will allow it.
 
 namespace UrlShortener.Workflow.Orchestration.Workflows;
 
@@ -24,7 +27,7 @@ public static class SdlcWorkflow
                 RequiresApproval = true,
                 Execute = ctx =>
                 {
-                    ctx.Data["design"] = "Completed";
+                    ctx.Data["design"] = "Design completed";
                     return Task.CompletedTask;
                 }
             },
@@ -34,30 +37,45 @@ public static class SdlcWorkflow
                 DependsOn = { "design" },
                 Execute = ctx =>
                 {
-                    ctx.Data["code"] = "Generated";
+                    ctx.Data["code"] = "Code generated";
                     return Task.CompletedTask;
                 }
             },
             new WorkflowNode
             {
-                Id = "testing",
+                Id = "unit-tests",
                 DependsOn = { "implementation" },
-                Execute = ctx =>
+                RunInParallel = true,
+                Execute = async ctx =>
                 {
-                    ctx.Data["tests"] = "Passed";
-                    return Task.CompletedTask;
+                    var tester = ctx.Services.GetRequiredService<ITestRunnerService>();
+                    await tester.RunUnitTestsAsync();
+                }
+            },
+            new WorkflowNode
+            {
+                Id = "integration-tests",
+                DependsOn = { "implementation" },
+                RunInParallel = true,
+                Execute = async ctx =>
+                {
+                    var tester = ctx.Services.GetRequiredService<ITestRunnerService>();
+                    await tester.RunIntegrationTestsAsync();
                 }
             },
             new WorkflowNode
             {
                 Id = "documentation",
-                DependsOn = { "testing" },
-                Execute = ctx =>
+                DependsOn = { "unit-tests", "integration-tests" },
+                RunInParallel = false,
+                Execute = async ctx =>
                 {
-                    ctx.Data["docs"] = "Generated";
-                    return Task.CompletedTask;
+                    var docs = ctx.Services.GetRequiredService<IDocumentationService>();
+                    var code = (string)ctx.Data["code"];
+                    ctx.Data["documentation"] = await docs.GenerateDocumentationAsync(code);
                 }
             }
+
         };
     }
 }

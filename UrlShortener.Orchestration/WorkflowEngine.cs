@@ -61,7 +61,30 @@ namespace UrlShortener.Workflow.Orchestration
                     break;
                 }
 
-                foreach (var node in readyNodes)
+                //foreach (var node in readyNodes)
+                //{
+                //    await ExecuteNodeAsync(node, context, run);
+                //    completed.Add(node.Id);
+                //}
+
+                // Split ready nodes into parallel and sequential
+                var parallelNodes = readyNodes.Where(n => n.RunInParallel).ToList();
+                var sequentialNodes = readyNodes.Where(n => !n.RunInParallel).ToList();
+
+                // Run parallel nodes
+                if (parallelNodes.Any())
+                {
+                    var tasks = parallelNodes.Select(async node =>
+                    {
+                        await ExecuteNodeAsync(node, context, run);
+                        completed.Add(node.Id);
+                    });
+
+                    await Task.WhenAll(tasks);
+                }
+
+                // Run sequential nodes
+                foreach (var node in sequentialNodes)
                 {
                     await ExecuteNodeAsync(node, context, run);
                     completed.Add(node.Id);
