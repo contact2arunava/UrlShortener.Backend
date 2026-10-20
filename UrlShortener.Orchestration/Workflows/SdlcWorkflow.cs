@@ -28,6 +28,10 @@ public static class SdlcWorkflow
                 Execute = ctx =>
                 {
                     ctx.Data["design"] = "Design completed";
+
+                    //Comment the line above and uncomment the lines below to simulate a design change after review
+                    //ctx.Data["design"] = "Design updated after review";
+                    //ctx.DirtyNodes.Add("design");
                     return Task.CompletedTask;
                 }
             },

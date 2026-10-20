@@ -8,4 +8,7 @@
 
     // In-memory event list (DB events are stored separately)
     public List<WorkflowEvent> Events { get; } = new();
+
+    // Nodes whose outputs have changed
+    public HashSet<string> DirtyNodes { get; } = new();
 }

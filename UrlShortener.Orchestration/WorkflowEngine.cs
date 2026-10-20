@@ -28,10 +28,11 @@ namespace UrlShortener.Workflow.Orchestration
         /// Runs a workflow against an existing persisted WorkflowRun.
         /// Controller creates the run (via IWorkflowRunRepository.CreateAsync)
         /// and passes the runId into this method.
+        /// Auto‑replanning: if any node marks itself dirty, downstream nodes are re‑executed.
         /// </summary>
         public async Task RunAsync(
-            Guid workflowRunId, 
-            IReadOnlyList<WorkflowNode> workflow, 
+            Guid workflowRunId,
+            IReadOnlyList<WorkflowNode> workflow,
             WorkflowContext context)
         {
             var run = await _repo.GetAsync(workflowRunId);
@@ -44,7 +45,7 @@ namespace UrlShortener.Workflow.Orchestration
             var completed = new HashSet<string>();
             var failed = new HashSet<string>();
 
-            // Simple dependency graph execution: keep running until all nodes are completed or failed
+            // === 1. Initial execution with parallel support ===
             while (completed.Count + failed.Count < workflow.Count)
             {
                 var readyNodes = workflow
@@ -56,18 +57,10 @@ namespace UrlShortener.Workflow.Orchestration
 
                 if (!readyNodes.Any())
                 {
-                    // No nodes ready but not all completed → deadlock or unmet dependency
                     _logger.LogWarning("No ready nodes found; workflow may be stuck.");
                     break;
                 }
 
-                //foreach (var node in readyNodes)
-                //{
-                //    await ExecuteNodeAsync(node, context, run);
-                //    completed.Add(node.Id);
-                //}
-
-                // Split ready nodes into parallel and sequential
                 var parallelNodes = readyNodes.Where(n => n.RunInParallel).ToList();
                 var sequentialNodes = readyNodes.Where(n => !n.RunInParallel).ToList();
 
@@ -91,12 +84,80 @@ namespace UrlShortener.Workflow.Orchestration
                 }
             }
 
+            // === 2. Auto dynamic re‑planning ===
+            if (context.DirtyNodes.Any())
+            {
+                _logger.LogInformation(
+                    "Dynamic re‑planning triggered. Dirty nodes: {DirtyNodes}",
+                    string.Join(", ", context.DirtyNodes));
+
+                var nodesToReRun = new HashSet<string>();
+
+                foreach (var dirty in context.DirtyNodes)
+                {
+                    if (!nodesById.ContainsKey(dirty))
+                        continue;
+
+                    var downstream = GetDownstreamNodes(workflow, dirty);
+                    foreach (var nodeId in downstream)
+                        nodesToReRun.Add(nodeId);
+                }
+
+                // Clear completion/failed state for downstream nodes
+                foreach (var nodeId in nodesToReRun)
+                {
+                    completed.Remove(nodeId);
+                    failed.Remove(nodeId);
+                }
+
+                // Re‑execute downstream nodes (same dependency + parallel logic)
+                while (completed.Count + failed.Count < workflow.Count)
+                {
+                    var readyNodes = workflow
+                        .Where(n =>
+                            !completed.Contains(n.Id) &&
+                            !failed.Contains(n.Id) &&
+                            n.DependsOn.All(d => completed.Contains(d)))
+                        .ToList();
+
+                    if (!readyNodes.Any())
+                    {
+                        _logger.LogWarning("No ready nodes found during re‑planning; workflow may be stuck.");
+                        break;
+                    }
+
+                    var parallelNodes = readyNodes.Where(n => n.RunInParallel).ToList();
+                    var sequentialNodes = readyNodes.Where(n => !n.RunInParallel).ToList();
+
+                    if (parallelNodes.Any())
+                    {
+                        var tasks = parallelNodes.Select(async node =>
+                        {
+                            await ExecuteNodeAsync(node, context, run);
+                            completed.Add(node.Id);
+                        });
+
+                        await Task.WhenAll(tasks);
+                    }
+
+                    foreach (var node in sequentialNodes)
+                    {
+                        await ExecuteNodeAsync(node, context, run);
+                        completed.Add(node.Id);
+                    }
+                }
+            }
+
+            // === 3. Mark workflow as completed ===
             run.IsCompleted = true;
             run.CompletedAt = DateTime.UtcNow;
             await _repo.UpdateAsync(run);
         }
 
-        private async Task ExecuteNodeAsync(WorkflowNode node, WorkflowContext context, WorkflowRun run)
+        private async Task ExecuteNodeAsync(
+            WorkflowNode node,
+            WorkflowContext context,
+            WorkflowRun run)
         {
             _logger.LogInformation("Starting node {NodeId}", node.Id);
 
@@ -104,7 +165,6 @@ namespace UrlShortener.Workflow.Orchestration
             run.IsWaitingForApproval = node.RequiresApproval;
             await _repo.UpdateAsync(run);
 
-            // If this node requires approval, wait for it
             if (node.RequiresApproval)
             {
                 _logger.LogInformation("Waiting for approval for node {NodeId}", node.Id);
@@ -157,7 +217,6 @@ namespace UrlShortener.Workflow.Orchestration
 
                     if (attempts > maxRetries)
                     {
-                        // Run rollback if defined
                         if (node.Rollback != null)
                         {
                             _logger.LogInformation("Running rollback for node {NodeId}", node.Id);
@@ -176,15 +235,39 @@ namespace UrlShortener.Workflow.Orchestration
                             await _repo.AddEventAsync(rollbackEvt);
                         }
 
-                        // After rollback, rethrow or mark as failed; here we just stop this node
                         _logger.LogWarning("Node {NodeId} exceeded max retries ({MaxRetries})", node.Id, maxRetries);
                         break;
                     }
 
-                    // Retry loop continues
+                    // retry continues
                 }
             }
         }
+
+        private static HashSet<string> GetDownstreamNodes(
+            IReadOnlyList<WorkflowNode> workflow,
+            string nodeId)
+        {
+            var result = new HashSet<string>();
+            var queue = new Queue<string>();
+            queue.Enqueue(nodeId);
+
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+
+                var children = workflow
+                    .Where(n => n.DependsOn.Contains(current))
+                    .Select(n => n.Id);
+
+                foreach (var child in children)
+                {
+                    if (result.Add(child))
+                        queue.Enqueue(child);
+                }
+            }
+
+            return result;
+        }
     }
- 
 }
