@@ -41,6 +41,18 @@ namespace UrlShortener.Workflow.Orchestration
                 throw new InvalidOperationException($"WorkflowRun '{workflowRunId}' not found.");
             }
 
+            if (run.IsCanceled)
+            {
+                _logger.LogWarning("WorkflowRun {RunId} is canceled. Execution aborted.", workflowRunId);
+                return;
+            }
+
+            if (run.IsPaused)
+            {
+                _logger.LogInformation("WorkflowRun {RunId} is paused. Execution halted.", workflowRunId);
+                return;
+            }
+
             var nodesById = workflow.ToDictionary(n => n.Id);
             var completed = new HashSet<string>();
             var failed = new HashSet<string>();

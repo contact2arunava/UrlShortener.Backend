@@ -24,7 +24,11 @@ CREATE TABLE WorkflowRuns (
     Id UNIQUEIDENTIFIER PRIMARY KEY,
     StartedAt DATETIME2 NOT NULL,
     CompletedAt DATETIME2 NULL,
+    IsPaused BIT NOT NULL Default 0,
+    IsCanceled BIT NOT NULL Default 0,
     IsCompleted BIT NOT NULL,
+    PauseReason NVARCHAR(200) NULL,
+    CancelReason NVARCHAR(200) NULL,
     CurrentNode NVARCHAR(200) NOT NULL,
     IsWaitingForApproval BIT NOT NULL
 );

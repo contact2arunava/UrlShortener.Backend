@@ -1,4 +1,6 @@
-﻿public class WorkflowContext
+﻿namespace UrlShortener.Domain.Workflow;
+
+public class WorkflowContext
 {
     // Allows workflow nodes to resolve DI services
     public IServiceProvider Services { get; set; } = default!;

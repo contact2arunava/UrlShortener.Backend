@@ -2,7 +2,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-using UrlShortener.Domain;
+using UrlShortener.Domain.Workflow;
 
 public class WorkflowRunRepository : IWorkflowRunRepository
 {
@@ -80,4 +80,35 @@ public class WorkflowRunRepository : IWorkflowRunRepository
         run.Events = events.ToList();
         return run;
     }
+
+    public async Task PauseAsync(Guid id, string reason)
+    {
+        using var db = new SqlConnection(_connectionString);
+        await db.ExecuteAsync(
+            @"UPDATE WorkflowRuns 
+          SET IsPaused = true, PauseReason = @Reason 
+          WHERE Id = @Id",
+            new { Id = id, Reason = reason });
+    }
+
+    public async Task ResumeAsync(Guid id)
+    {
+        using var db = new SqlConnection(_connectionString);
+        await db.ExecuteAsync(
+            @"UPDATE WorkflowRuns 
+          SET IsPaused = false, PauseReason = null
+          WHERE Id = @Id",
+            new { Id = id });
+    }
+
+    public async Task CancelAsync(Guid id, string reason)
+    {
+        using var db = new SqlConnection(_connectionString);
+        await db.ExecuteAsync(
+            @"UPDATE WorkflowRuns 
+          SET IsCanceled = true, CancelReason = @Reason 
+          WHERE Id = @Id",
+            new { Id = id, Reason = reason });
+    }
+
 }
